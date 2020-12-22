@@ -33,31 +33,44 @@ const item3 = new Item({
 });
 
 app.get("/", function(req, res) {
-  res.render("list", {listTitle: "Today" ,newListItems: items});
+
+  Item.find({},function(err,foundItems){
+
+    if(foundItems.length===0){
+      Item.insertMany(defaultItems,function(err){
+      if (err){
+        console.log(err)
+
+      }else{
+        console.log("SAVED>>>>>>")
+      }
+    });
+    res.redirect("/");
+    }else{
+      res.render("list", {listTitle: "Today" ,newListItems: foundItems});
+
+    }
+  
+  });
+
+  
 });
 
 const defaultItems= [item1,item2,item3];
 
-Item.insertMany(defaultItems,function(err){
-  if (err){
-    console.log(err)
+// Item.insertMany(defaultItems,function(err){
+//   if (err){
+//     console.log(err)
 
-  }else{
-    console.log("SAVED>>>>>>")
-  }
-})
+//   }else{
+//     console.log("SAVED>>>>>>")
+//   }
+// })
 
 app.post("/",function(req,res){
-  const item = req.body.newItem;
-  if (req.body.list ==="Work"){
-    workItems.push(item);
-    res.redirect("/work");
 
-  }else{
-    items.push(item);
-    res.redirect("/");
-  }
-  
+  const item = req.body.newItem;
+ 
   
 
 });
