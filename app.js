@@ -32,6 +32,15 @@ const item3 = new Item({
   name:"Hit the delete an item"
 });
 
+const defaultItems=[item1,item2,item3];
+
+const listSchema = { 
+  name: String,
+  items: [itemsSchema]
+
+};
+const List=mongoose.model("List",listSchema);
+
 app.get("/", function(req, res) {
 
   Item.find({},function(err,foundItems){
@@ -56,7 +65,7 @@ app.get("/", function(req, res) {
   
 });
 
-const defaultItems= [item1,item2,item3];
+
 
 // Item.insertMany(defaultItems,function(err){
 //   if (err){
@@ -97,7 +106,33 @@ app.post("/delete",function(req,res){
 //   res.render("list",{listTitle:"Work List",newListItems:workItems});
 // });
 
+app.get("/:customListName",function(req,res){
+ const customListName=req.params.customListName;
 
+List.findOne({name:customListName},function(err,foundlist){
+  if(!err){
+    if(!foundlist){
+      //Create a new list
+      const list=new List({
+        name:customListName,
+        item:defaultItems
+      
+       });
+       list.save();
+       res.redirect("/"+customListName);
+    }
+    else{
+      //Show an existing list
+
+      res.render("list",{listTitle: foundlist.name ,newListItems: foundlist.items});
+    }
+  }
+});
+
+ 
+
+
+});
 
 app.get("/about", function(req,res){
   res.render("about")
